@@ -63,3 +63,115 @@ const galleryItems = [
     description: 'Lighthouse Coast Sea',
   },
 ];
+
+const refs = {
+  galleryEl: document.querySelector('.gallery'),
+  lightboxEl: document.querySelector('.lightbox'),
+  btnCloseEl: document.querySelector('.lightbox__button'),
+  lightboxImageEl: document.querySelector('.lightbox__image'),
+  lightboxOverlayEl:document.querySelector('.lightbox__overlay'),
+  
+};
+const listItemsGallery = createGallery(galleryItems);
+
+refs.galleryEl.innerHTML = listItemsGallery;
+
+function createGallery(imgs){
+  return imgs.map((img , index)  => `
+  <li class="gallery__item">
+    <img
+      class="gallery__image"
+      data-index = "${index}"
+      src="${img.preview}"
+      data-source="${img.original}"
+      alt="${img.description}"
+    /> 
+</li>
+  `).join('');
+}
+const galleryImages = document.querySelectorAll('.gallery__image');
+
+
+refs.galleryEl.addEventListener('click', onGalleryItemOpen);
+refs.btnCloseEl.addEventListener('click', onGalleryItemClose);
+refs.lightboxOverlayEl.addEventListener('click' , onOverlayClick);
+
+
+function onGalleryItemOpen(e){
+  const currentTargetIndex = e.target.dataset.index;
+  refs.lightboxEl.classList.add('is-open');
+  refs.lightboxImageEl.setAttribute('index' , currentTargetIndex);  
+  
+
+ lightboxImageContent();
+ 
+  window.addEventListener('keydown', onKeyEscPress);
+  window.addEventListener('keydown' , onArrowLeftPress);
+  window.addEventListener('keydown' , onArrowRightPress);
+}
+function lightboxImageContent(){
+  let currentIndex = refs.lightboxImageEl.getAttribute('index');
+
+  refs.lightboxImageEl.src = galleryItems[currentIndex].original;
+  refs.lightboxImageEl.alt = galleryItems[currentIndex].description;
+  
+}
+
+function onGalleryItemClose(e){
+  refs.lightboxEl.classList.remove('is-open');
+  refs.lightboxImageEl.src = '';
+  window.removeEventListener('keydown', onKeyEscPress);
+}
+
+function onOverlayClick (e){
+  if(e.target === e.currentTarget){
+    onGalleryItemClose();
+  }
+}
+
+function onKeyEscPress(e){
+  const ESC_KEY_CODE = 'Escape';
+  if(e.code === ESC_KEY_CODE){
+    onGalleryItemClose();
+  }
+}
+
+function onArrowLeftPress(e){
+  if(e.code === 'ArrowLeft'){
+    onArrowLeft();
+  }
+}
+function onArrowRightPress(e){
+  if(e.code === 'ArrowRight'){
+    onArrowRight();
+  }
+}
+
+
+function onArrowRight(){
+  let currentIndex = refs.lightboxImageEl.getAttribute('index');
+  if(currentIndex < galleryItems.length - 1){ 
+    currentIndex = +currentIndex + 1;
+  } 
+  else{
+    currentIndex = 0; 
+  }
+  console.log(currentIndex)
+  refs.lightboxImageEl.src = galleryItems[currentIndex].original;
+  refs.lightboxImageEl.alt = galleryItems[currentIndex].description;
+  refs.lightboxImageEl.setAttribute('index' , currentIndex);
+}
+
+function onArrowLeft(){
+  let currentIndex = refs.lightboxImageEl.getAttribute('index');
+  if(currentIndex - 1 < 0){
+    currentIndex = galleryItems.length - 1;
+  } else {
+    currentIndex -= 1;
+   
+  }
+  console.log(currentIndex)
+  refs.lightboxImageEl.src = galleryItems[currentIndex].original;
+  refs.lightboxImageEl.alt = galleryItems[currentIndex].description;
+  refs.lightboxImageEl.setAttribute('index' , currentIndex);
+}
